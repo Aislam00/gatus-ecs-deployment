@@ -1,0 +1,25 @@
+name: Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build container
+      working-directory: ./app
+      run: docker build -t gatus .
+
+    - name: Test container
+      run: |
+        docker run -d --name test -p 8080:8080 gatus
+        sleep 10
+        curl -f http://localhost:8080/health
+        docker stop test
+        docker rm test

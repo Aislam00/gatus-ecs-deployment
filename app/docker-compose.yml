@@ -1,0 +1,26 @@
+services:
+  gatus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: "dev"
+        COMMIT: "local"
+        DATE: "2025-01-01"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config.yaml:/config/config.yaml:ro
+      - gatus_data:/data
+    environment:
+      - GATUS_CONFIG_PATH=/config/config.yaml
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  gatus_data:
