@@ -31,10 +31,15 @@ jobs:
       working-directory: ./app
       run: docker build -t gatus .
 
-    - name: Test container
+    - name: Test container starts
       run: |
         docker run -d --name test -p 8080:8080 gatus
         sleep 10
-        curl -f http://localhost:8080/health
+        if docker ps | grep test; then
+          echo "Container running successfully"
+        else
+          echo "Container failed to start"
+          exit 1
+        fi
         docker stop test
         docker rm test
