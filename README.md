@@ -18,6 +18,34 @@ This project uses Gatus (an open-source health checker) to monitor external serv
 
 The platform does HTTP health checks every few minutes and shows the results on a clean dashboard. Pretty useful for keeping track of service dependencies.
 
+## Security Features
+
+Production-ready security measures:
+- **Container vulnerability scanning** - Trivy scans Docker images for known security vulnerabilities
+- **Network isolation** - Containers run in private subnets with no direct internet access
+- **WAF protection** - AWS WAF blocks common web attacks and implements rate limiting
+- **HTTPS enforcement** - All traffic encrypted with automatic SSL certificate management
+- **Least privilege IAM** - Each service gets only the minimum permissions required
+
+## How to deploy
+
+Deploy the Terraform backend:
+```bash
+cd terraform/backend
+terraform init
+terraform apply
+```
+
+Deploy the main infrastructure:
+```bash
+cd ../environments/dev
+terraform init
+terraform plan
+terraform apply
+```
+
+The GitHub Actions pipeline handles container builds and deployments automatically when you push to main. Make sure to add your AWS credentials as GitHub secrets first.
+
 ## Architecture
 
 ![Architecture](screenshots/architecture-diagram.png)
@@ -30,20 +58,13 @@ The platform does HTTP health checks every few minutes and shows the results on 
 - **WAF** - Basic protection against common attacks
 - **CloudWatch** - Monitoring and alerting
 
-## Security Features
+## Live Application
 
-![Application](screenshots/app-dashboard.png)
+![Application Dashboard](screenshots/app-dashboard.png)
 
-Production-ready security measures:
-- **Container vulnerability scanning** - Trivy scans Docker images for known security vulnerabilities
-- **Network isolation** - Containers run in private subnets with no direct internet access
-- **WAF protection** - AWS WAF blocks common web attacks and implements rate limiting
-- **HTTPS enforcement** - All traffic encrypted with automatic SSL certificate management
-- **Least privilege IAM** - Each service gets only the minimum permissions required
+The deployed Gatus monitoring platform showing real-time health checks of external services and APIs.
 
 ## CI/CD Pipeline
-
-![Pipeline Status](screenshots/github-actions.png)
 
 The pipeline runs three stages:
 
@@ -55,66 +76,22 @@ The pipeline runs three stages:
 
 Pipeline triggers on every push to main but requires manual terraform deployment for infrastructure changes. This separation allows for proper review processes in production environments.
 
-## How to deploy
+![Pipeline Status](screenshots/github-actions.png)
 
-First deploy the backend (this creates the S3 bucket for Terraform state):
-```bash
-cd terraform/backend
-terraform init
-terraform apply
-```
+## Infrastructure & Operations
 
-Then deploy the main infrastructure:
-```bash
-cd ../environments/dev
-terraform init
-terraform plan
-terraform apply
-```
-
-The GitHub Actions pipeline handles container builds and deployments automatically when you push to main. Make sure to add your AWS credentials as GitHub secrets first.
-
-## Screenshots
-
-### Infrastructure Overview
-
+### Terraform Structure
 ![Terraform Structure](screenshots/terraform-modules.png)
 
 ### ECS Service Configuration
-
 ![ECS Service](screenshots/ecs-service.png)
 
 ### Load Balancer Setup
-
 ![ALB Configuration](screenshots/alb-listeners.png)
 
 ### CloudWatch Monitoring
-
 ![Monitoring Dashboard](screenshots/cloudwatch-dashboard.png)
 
-## What I Learned
+## Project Overview
 
-**ECS Auto Scaling:** Understanding how CPU-based scaling works with Fargate and when containers spin up/down based on load.
-
-**Infrastructure as Code:** Terraform module design and organizing code for reusability across environments.
-
-**Container Security:** Integrating Trivy scanning into CI/CD and handling vulnerability findings.
-
-**AWS Networking:** VPC setup, security groups, and load balancer configuration for containerized apps.
-
-## Possible Next Implementations
-
-- Multi-region deployment for global monitoring
-- Custom metrics integration with CloudWatch
-- Slack/Teams integration for real-time alerts
-- API endpoint for programmatic health check management
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-**Tech Stack:** Terraform, AWS ECS Fargate, GitHub Actions, Docker, Gatus  
-**Live Service:** https://tm.iasolutions.co.uk  
-**Portfolio:** [github.com/Aislam00](https://github.com/Aislam00)
+This is a full end-to-end project demonstrating enterprise-grade AWS containerized infrastructure with Infrastructure as Code, automated CI/CD pipelines, security scanning, and production monitoring. The platform showcases real-world ECS Fargate operations with auto-scaling and comprehensive observability for external service monitoring.
