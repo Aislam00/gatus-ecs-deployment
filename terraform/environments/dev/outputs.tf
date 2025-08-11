@@ -32,3 +32,13 @@ output "ecs_cluster_name" {
   description = "Name of the ECS cluster"
   value       = module.ecs.cluster_name
 }
+
+output "alb_dns_name" {
+  description = "DNS name of the load balancer"
+  value       = module.alb.alb_dns_name
+}
+
+output "domain_name" {
+  description = "Domain name for the application"
+  value       = var.domain_name
+}

@@ -16,15 +16,18 @@ provider "aws" {
     tags = {
       Project   = var.project_name
       Purpose   = "terraform-backend"
-      Owner     = "AlaminIslam"
+      Owner     = var.owner
       ManagedBy = "terraform"
     }
   }
 }
 
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
 resource "aws_kms_key" "terraform_state" {
   description             = "KMS key for Terraform state encryption"
-  deletion_window_in_days = 7
+  deletion_window_in_days = 30
   enable_key_rotation     = true
 
   tags = {
@@ -38,7 +41,7 @@ resource "aws_kms_alias" "terraform_state" {
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "${var.project_name}-terraform-state-${var.aws_account_id}-${var.aws_region}"
+  bucket = "${var.project_name}-terraform-state-${data.aws_caller_identity.current.account_id}-${data.aws_region.current.name}"
 
   lifecycle {
     prevent_destroy = true
@@ -72,6 +75,31 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" 
 
 resource "aws_s3_bucket_public_access_block" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_logging" "terraform_state" {
+  bucket = aws_s3_bucket.terraform_state.id
+
+  target_bucket = aws_s3_bucket.access_logs.id
+  target_prefix = "terraform-state-logs/"
+}
+
+resource "aws_s3_bucket" "access_logs" {
+  bucket = "${var.project_name}-terraform-state-logs-${data.aws_caller_identity.current.account_id}-${data.aws_region.current.name}"
+
+  tags = {
+    Name        = "Terraform State Access Logs"
+    Environment = "shared"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
 
   block_public_acls       = true
   block_public_policy     = true
