@@ -1,92 +1,128 @@
-# Gatus ECS Deployment
+# Gatus ECS Monitoring Platform
+Containerized health monitoring platform running on AWS ECS Fargate with automated deployments and security scanning.
 
-**Tech Stack:** Terraform, AWS (ECS, ALB, Route53, CloudWatch, WAF), GitHub Actions, Docker, Gatus
+## Table of Contents
+- [Overview](#overview)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Live Application](#live-application)
+- [Security Features](#security-features)
+- [Pipeline in Action](#pipeline-in-action)
+- [Monitoring & Operations](#monitoring--operations)
+- [Key Features](#key-features)
+- [Getting Started](#getting-started)
+- [How to Use](#how-to-use)
 
-A containerized monitoring platform deployed on AWS ECS Fargate that tracks external APIs and services.
+## Overview
+Production monitoring platform that tracks external APIs and services using **Gatus** (open-source health monitoring tool). Runs on AWS ECS Fargate with automatic scaling and complete CI/CD pipeline. Infrastructure is fully automated through Terraform.
 
-**Live Application:** https://tm.iasolutions.co.uk
+**Live monitoring:** https://tm.iasolutions.co.uk
 
-## What it does
+## Tech Stack
+**AWS Infrastructure**
+- ECS Fargate for serverless containers
+- Application Load Balancer with SSL termination
+- VPC with multi-tier networking
+- ECR for container registry
+- Route53 for DNS management
 
-This project uses Gatus (an open-source health checker) to monitor external services. It runs on AWS ECS Fargate and automatically scales based on demand. The whole infrastructure is built with Terraform modules so it's easy to replicate.
+**Application**
+- Gatus (open-source monitoring)
+- Docker containerization
+- Auto-scaling based on demand
 
-The platform does HTTP health checks every few minutes and shows the results on a clean dashboard. Pretty useful for keeping track of service dependencies.
+**Security & Monitoring**
+- AWS WAF for protection
+- CloudWatch for metrics and alerting
+- Trivy for vulnerability scanning
 
-## Key Components
-
-- **ECS Fargate** - Runs containers without managing servers
-- **Application Load Balancer** - Handles SSL and distributes traffic  
-- **VPC** - Multi-tier network setup with private subnets
-- **Auto Scaling** - Scales from 1-4 containers based on CPU usage
-- **WAF** - Basic protection against common attacks
-- **CloudWatch** - Monitoring and alerting
-- **CI/CD** - GitHub Actions pipeline that builds and deploys automatically
-
-## Security Features
-
-Production-ready security measures:
-
-- **Container vulnerability scanning** - Trivy scans Docker images for known security vulnerabilities
-- **Network isolation** - Containers run in private subnets with no direct internet access
-- **WAF protection** - AWS WAF blocks common web attacks and implements rate limiting
-- **HTTPS enforcement** - All traffic encrypted with automatic SSL certificate management
-- **Least privilege IAM** - Each service gets only the minimum permissions required
-- **Security groups** - Restrictive firewall rules allowing only necessary traffic
+**Automation**
+- GitHub Actions for CI/CD
+- Terraform for infrastructure
 
 ## Architecture
+**Infrastructure Overview**
+![Architecture](screenshots/architecture-diagram.png)
 
-The infrastructure follows a standard 3-tier architecture with public subnets for the load balancer, private subnets for the ECS tasks, and isolated subnets for future database needs. Everything routes through an internet gateway with NAT gateways providing outbound access for containers.
+**Terraform Module Structure**
+![Terraform Structure](screenshots/terraform-modules.png)
 
-## How to deploy
+## Live Application
+![Application Dashboard](screenshots/app-dashboard.png)
 
-First deploy the backend (this creates the S3 bucket for Terraform state):
+## Security Features
+**Container Security**
+- Vulnerability scanning with Trivy on every build
+- Containers run in private subnets with no direct internet access
+- Least privilege IAM roles for all services
+
+**Network Security**
+- AWS WAF protection against common web attacks
+- Security groups with restrictive firewall rules
+- HTTPS enforcement with automatic certificate management
+
+## Pipeline in Action
+
+**Infrastructure Validation**
+![Pipeline Status](screenshots/github-actions.png)
+
+**ECS Deployment**
+![ECS Service](screenshots/ecs-service.png)
+
+## Monitoring & Operations
+
+**Load Balancer Configuration**
+![ALB Configuration](screenshots/alb-listeners.png)
+
+**CloudWatch Monitoring**
+![Monitoring Dashboard](screenshots/cloudwatch-dashboard.png)
+
+## Key Features
+- **Serverless containers** - ECS Fargate eliminates server management
+- **Auto-scaling** - Scales from 1-4 containers based on CPU usage
+- **Security scanning** - Trivy scans every container build for vulnerabilities
+- **Multi-tier networking** - Proper separation with private subnets
+- **WAF protection** - Built-in protection against common attacks
+- **Infrastructure as code** - Everything deployed via Terraform modules
+
+## Getting Started
+
+You'll need:
+- AWS account with CLI configured
+- Terraform installed
+- Docker for local testing
 
 ```bash
+# Get the code
+git clone https://github.com/[your-username]/gatus-ecs-project.git
+cd gatus-ecs-project
+
+# Deploy backend first
 cd terraform/backend
 terraform init
 terraform apply
-```
 
-Then deploy the main infrastructure:
-
-```bash
+# Deploy the infrastructure
 cd ../environments/dev
 terraform init
-terraform plan
 terraform apply
 ```
 
-The GitHub Actions pipeline handles container builds and deployments automatically when you push to main. Make sure to add your AWS credentials as GitHub secrets first.
+## How to Use
 
-## CI/CD Pipeline
+```bash
+# Check ECS service status
+aws ecs describe-services --cluster gatus-cluster --services gatus-service
 
-The pipeline runs three stages:
+# View container logs
+aws logs tail /ecs/gatus --follow
 
-**Validation Stage** - Checks Terraform code format and validates configuration
-**Security Stage** - Trivy scans the container image for vulnerabilities and reports findings
-**Build & Deploy Stage** - Builds the Docker image, pushes to ECR, and updates the ECS service
+# Scale the service manually
+aws ecs update-service --cluster gatus-cluster --service gatus-service --desired-count 3
+```
 
-Pipeline triggers on every push to main but requires manual terraform deployment for infrastructure changes. This separation allows for proper review processes in production environments.
+The GitHub Actions pipeline automatically builds and deploys when you push to main.
 
-## Screenshots
+## Notes
 
-### Architecture Overview
-![Architecture](screenshots/architecture-diagram.png)
-
-### Application Dashboard
-![Application](screenshots/app-dashboard.png)
-
-### Terraform Module Structure
-![Terraform Structure](screenshots/terraform-modules.png)
-
-### ECS Service Configuration
-![ECS Service](screenshots/ecs-service.png)
-
-### Load Balancer Setup
-![ALB Configuration](screenshots/alb-listeners.png)
-
-### CloudWatch Monitoring
-![Monitoring Dashboard](screenshots/cloudwatch-dashboard.png)
-
-### CI/CD Pipeline
-![Pipeline Status](screenshots/github-actions.png)
+This project demonstrates containerized applications on AWS without managing servers. The monitoring setup provides visibility into both application and infrastructure performance.
