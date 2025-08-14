@@ -2,7 +2,7 @@
 
 **Tech Stack:** Terraform, AWS (ECS, ALB, Route53, CloudWatch, WAF), GitHub Actions, Docker, Gatus
 
-A containerized monitoring platform deployed on AWS ECS Fargate that tracks external APIs and services.
+A containerized monitoring platform deployed on AWS ECS Fargate that tracks external APIs and services with enterprise-grade CI/CD automation.
 
 **Live Application:** https://tm.iasolutions.co.uk
 
@@ -66,32 +66,50 @@ The deployed Gatus monitoring platform showing real-time health checks of extern
 
 ## CI/CD Pipeline
 
-The pipeline runs three stages:
+Professional separation of concerns with dedicated CI and CD workflows:
 
-**Validation Stage** - Checks Terraform code format and validates configuration
+### Continuous Integration (CI)
+![CI Pipeline](screenshots/Ci-gatecs.png)
 
-**Security Stage** - Trivy scans the container image for vulnerabilities and reports findings
+**CI Pipeline** runs automatically on every push and includes:
+- **Validation Stage** - Terraform code format checking and configuration validation
+- **Security Stage** - Trivy vulnerability scanning of container images
+- **Build Stage** - Docker image building and pushing to Amazon ECR
 
-**Build & Deploy Stage** - Builds the Docker image, pushes to ECR, and updates the ECS service
+### Continuous Deployment (CD)
+![CD Pipeline](screenshots/cd-gatecs.png)
 
-Pipeline triggers on every push to main but requires manual terraform deployment for infrastructure changes. This separation allows for proper review processes in production environments.
+**CD Pipeline** triggers after successful CI completion but requires manual approval:
+- **Environment Protection** - Manual approval gate for production deployments
+- **Deployment** - Updates ECS service with new container image
+- **Health Checks** - Waits for deployment stability confirmation
 
-![Pipeline Status](screenshots/github-actions.png)
+The approval gate ensures deployments happen only after human review, following enterprise best practices for production safety.
 
 ## Infrastructure & Operations
 
 ### Terraform Structure
 ![Terraform Structure](screenshots/terraform-modules.png)
 
+Modular infrastructure design with separate modules for networking, compute, security, and monitoring components.
+
 ### ECS Service Configuration
 ![ECS Service](screenshots/ecs-service.png)
+
+Production ECS Fargate service running with proper health checks and auto-scaling configuration.
 
 ### Load Balancer Setup
 ![ALB Configuration](screenshots/alb-listeners.png)
 
+Application Load Balancer configured with SSL termination and health check endpoints.
+
 ### CloudWatch Monitoring
 ![Monitoring Dashboard](screenshots/cloudwatch-dashboard.png)
 
+Cloudwatch monitoring dashboard tracking container metrics, application performance, and infrastructure health.
+
 ## Project Overview
 
-This is a full end-to-end project demonstrating enterprise-grade AWS containerized infrastructure with Infrastructure as Code, automated CI/CD pipelines, security scanning, and production monitoring. The platform showcases real-world ECS Fargate operations with auto-scaling and comprehensive observability for external service monitoring.
+This is a full end-to-end project demonstrating enterprise-grade AWS containerized infrastructure with Infrastructure as Code, automated CI/CD pipelines with approval gates, security scanning, and production monitoring. The platform showcases real-world ECS Fargate operations with proper deployment controls and comprehensive observability for external service monitoring.
+
+The CI/CD implementation follows industry best practices with separated build and deployment workflows, ensuring code quality through automated testing while maintaining deployment safety through manual approval processes.
