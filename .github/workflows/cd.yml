@@ -1,0 +1,31 @@
+name: CD
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch'
+    environment: production
+    
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-2
+
+    - name: Deploy to ECS
+      run: |
+        aws ecs update-service --cluster gatus-ecs-dev --service gatus-ecs-dev --force-new-deployment --region eu-west-2
+
+    - name: Wait for deployment
+      run: |
+        aws ecs wait services-stable --cluster gatus-ecs-dev --services gatus-ecs-dev --region eu-west-2

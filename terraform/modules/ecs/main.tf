@@ -103,22 +103,22 @@ resource "aws_ecs_task_definition" "gatus" {
   cpu                      = var.task_cpu
   memory                   = var.task_memory
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
-  task_role_arn           = aws_iam_role.ecs_task_role.arn
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
 
   container_definitions = jsonencode([
     {
       name  = "gatus"
       image = "${var.ecr_repository_url}:latest"
-      
+
       essential = true
-      
+
       portMappings = [
         {
           containerPort = 8080
           protocol      = "tcp"
         }
       ]
-      
+
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -127,12 +127,12 @@ resource "aws_ecs_task_definition" "gatus" {
           "awslogs-stream-prefix" = "ecs"
         }
       }
-      
+
       healthCheck = {
-        command = ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
-        interval = 30
-        timeout = 5
-        retries = 3
+        command     = ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
         startPeriod = 60
       }
     }

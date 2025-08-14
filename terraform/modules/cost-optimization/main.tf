@@ -4,7 +4,7 @@ resource "aws_budgets_budget" "gatus_budget" {
   limit_amount = "10"
   limit_unit   = "USD"
   time_unit    = "MONTHLY"
-  
+
   cost_filter {
     name   = "TagKeyValue"
     values = ["Project$${var.project_name}"]
