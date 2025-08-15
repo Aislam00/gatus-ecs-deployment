@@ -48,7 +48,7 @@ The GitHub Actions pipeline handles container builds and deployments automatical
 
 ## Architecture
 
-![Architecture Diagram](screenshots/arc-diagram.png)
+![Architecture Diagram](screenshots/ECS-GATUS.PNG)
 
 **Key Components:**
 - **ECS Fargate** - Runs containers without managing servers
