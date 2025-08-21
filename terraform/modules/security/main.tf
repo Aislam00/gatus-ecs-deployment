@@ -3,7 +3,6 @@ resource "aws_security_group" "alb" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description = "HTTP from internet"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -11,7 +10,6 @@ resource "aws_security_group" "alb" {
   }
 
   ingress {
-    description = "HTTPS from internet"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -19,7 +17,6 @@ resource "aws_security_group" "alb" {
   }
 
   egress {
-    description = "All outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -40,7 +37,6 @@ resource "aws_security_group" "ecs" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description     = "Application port from ALB"
     from_port       = 8080
     to_port         = 8080
     protocol        = "tcp"
@@ -48,7 +44,6 @@ resource "aws_security_group" "ecs" {
   }
 
   egress {
-    description = "All outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -69,7 +64,6 @@ resource "aws_security_group" "rds" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description     = "PostgreSQL from ECS"
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
@@ -90,7 +84,6 @@ resource "aws_security_group" "vpc_endpoints" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description = "HTTPS from VPC"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -98,7 +91,6 @@ resource "aws_security_group" "vpc_endpoints" {
   }
 
   egress {
-    description = "All outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"

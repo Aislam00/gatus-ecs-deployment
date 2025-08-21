@@ -28,7 +28,6 @@ resource "aws_cloudwatch_metric_alarm" "billing_alarm" {
   period              = "86400"
   statistic           = "Maximum"
   threshold           = "15"
-  alarm_description   = "This metric monitors estimated billing charges"
   alarm_actions       = []
 
   dimensions = {

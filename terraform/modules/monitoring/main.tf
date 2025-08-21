@@ -58,7 +58,6 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu" {
   period              = "300"
   statistic           = "Average"
   threshold           = "80"
-  alarm_description   = "ECS CPU utilization high"
   alarm_actions       = [aws_sns_topic.alerts.arn]
 
   dimensions = {
